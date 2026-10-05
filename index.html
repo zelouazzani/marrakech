@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Marrakech Reflections</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sand:#F5EFE6; --paper:#FBF8F3; --terracotta:#B8603F; --deep:#1E1813;
+    --gold:#A8842C; --warm:#8C7355; --line:#DCCFBF; --soft:#EFE6D9; --night:#171310;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--paper);color:var(--deep);font-family:'DM Sans',Arial,sans-serif;font-weight:300;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.55}
+  button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+
+  /* progress */
+  .top{position:fixed;top:0;left:0;right:0;z-index:5;background:linear-gradient(var(--paper) 70%,rgba(251,248,243,0));padding:14px 20px 18px}
+  .top-in{max-width:620px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  .brand{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--terracotta);font-weight:500;white-space:nowrap}
+  .bar{flex:1;height:2px;background:var(--soft);position:relative;overflow:hidden}
+  .bar i{position:absolute;inset:0 auto 0 0;width:0;background:var(--gold);transition:width .5s ease}
+  .count{font-size:11px;color:var(--warm);min-width:38px;text-align:right}
+  .top.hide{opacity:0;pointer-events:none}
+
+  /* screens */
+  .screen{display:none;min-height:100vh;min-height:100dvh;padding:86px 20px 130px}
+  .screen.on{display:block;animation:rise .55s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .wrap{max-width:620px;margin:0 auto}
+  .label{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--terracotta);font-weight:500;margin-bottom:14px}
+  .rule{width:46px;height:2px;background:var(--gold);margin:0 0 22px}
+  h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:clamp(34px,8vw,48px);line-height:1.08;margin-bottom:12px}
+  h2{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:clamp(25px,6vw,32px);line-height:1.2;margin-bottom:10px}
+  .sub{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:18px;color:var(--warm);margin-bottom:24px}
+  .hint{font-size:14px;color:var(--warm);margin-bottom:24px}
+  p.body{font-size:16px;margin-bottom:14px}
+
+  /* hero */
+  .hero{position:relative;min-height:100vh;min-height:100dvh;padding:0;display:none;color:#fff;background:var(--night)}
+  .hero.on{display:flex;animation:fade .8s ease both}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.62}
+  .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(23,19,16,.15) 0%,rgba(23,19,16,.35) 42%,rgba(23,19,16,.9) 100%)}
+  .hero .in{position:relative;margin-top:auto;width:100%;max-width:620px;margin-left:auto;margin-right:auto;padding:40px 24px 48px}
+  .hero .label{color:#E3B98F}
+  .hero h1{color:#fff}
+  .hero .sub{color:#E8DCCB}
+  .hero p.body{color:#F1E9DE;max-width:480px}
+  .hero .rule{background:#E3B98F}
+  .dates{font-family:'Playfair Display',Georgia,serif;font-size:17px;color:#F1E9DE;margin:-4px 0 22px;letter-spacing:.02em}
+  .dates span{color:#E3B98F;margin:0 8px}
+
+  /* inputs */
+  textarea,input[type=text]{width:100%;border:0;border-bottom:1.5px solid var(--line);background:transparent;font:inherit;font-size:18px;color:var(--deep);padding:10px 2px;outline:none;resize:none;transition:border-color .2s}
+  textarea{min-height:110px;border:1.5px solid var(--line);border-radius:3px;padding:14px;background:#fff;font-size:16px;line-height:1.5}
+  textarea:focus,input[type=text]:focus{border-color:var(--terracotta)}
+  ::placeholder{color:#B5A794;font-style:italic;font-weight:300}
+  .opt{font-size:12px;color:var(--warm);letter-spacing:.04em;margin:18px 0 8px}
+
+  /* scale 0-10 */
+  .scale{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin:8px 0 6px}
+  .scale button{aspect-ratio:1/1.15;border:1.5px solid var(--line);border-radius:3px;font-size:15px;font-weight:400;background:#fff;transition:all .15s;display:flex;align-items:center;justify-content:center}
+  .scale button:hover{border-color:var(--gold)}
+  .scale button.sel{background:var(--terracotta);border-color:var(--terracotta);color:#fff}
+  .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--warm);font-style:italic}
+  .scale.sm button{font-size:13px}
+
+  /* rated rows */
+  .row{padding:18px 0 16px;border-bottom:1px solid var(--soft)}
+  .row:last-child{border-bottom:0}
+  .row .name{font-family:'Playfair Display',Georgia,serif;font-size:19px}
+  .row .role{font-size:13px;color:var(--warm);margin-bottom:8px}
+  .row .na{font-size:12.5px;color:var(--warm);text-decoration:underline;text-underline-offset:3px;margin-top:8px}
+  .row .na.sel{color:var(--terracotta);font-weight:500;text-decoration:none}
+  .row .na.sel:before{content:"\2713  "}
+  .why{display:none;margin-top:14px}
+  .why.show{display:block;animation:rise .35s ease both}
+  .why textarea{min-height:76px}
+  .why .opt{margin-top:4px;color:var(--terracotta);font-size:13px;letter-spacing:0}
+
+  /* choices */
+  .choices{display:grid;gap:10px;margin:6px 0 4px}
+  .choice{display:flex;align-items:center;gap:14px;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:3px;padding:14px 16px;transition:all .15s}
+  .choice .dot{flex:none;width:12px;height:12px;border:1.5px solid var(--terracotta);transform:rotate(45deg);transition:all .15s}
+  .choice .t{font-size:16px;line-height:1.35}
+  .choice .t small{display:block;font-size:12.5px;color:var(--warm);margin-top:2px}
+  .choice:hover{border-color:var(--gold)}
+  .choice.sel{border-color:var(--terracotta);background:#FBF1EA}
+  .choice.sel .dot{background:var(--terracotta)}
+  .choice.dim{opacity:.45}
+  .pickcount{font-size:12.5px;color:var(--warm);margin-top:6px;min-height:1em}
+
+  .private{display:flex;gap:10px;align-items:flex-start;background:var(--sand);border-left:2px solid var(--gold);padding:12px 14px;font-size:13.5px;color:var(--warm);margin-bottom:12px}
+  .photo{margin:34px -20px 0;height:240px;overflow:hidden}
+  .photo img{width:100%;height:100%;object-fit:cover;display:block}
+  @media (min-width:660px){.photo{margin:34px 0 0;border-radius:2px}}
+
+  /* required-answer prompt */
+  .need{display:none;margin-top:18px;font-size:14px;color:var(--terracotta);font-style:italic}
+  .need.show{display:block;animation:rise .3s ease both}
+  .missing .scale button,.missing.choices .choice,textarea.missing,input.missing{border-color:#D69A80}
+
+  /* nav */
+  .nav{position:fixed;bottom:0;left:0;right:0;z-index:5;background:linear-gradient(rgba(251,248,243,0),var(--paper) 35%);padding:26px 20px calc(18px + env(safe-area-inset-bottom))}
+  .nav-in{max-width:620px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .btn{background:var(--deep);color:var(--paper);padding:14px 28px;border-radius:2px;font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;transition:background .2s}
+  .btn:hover{background:var(--terracotta)}
+  .btn.light{background:#F1E9DE;color:var(--deep)}
+  .btn.light:hover{background:#fff}
+  .back{font-size:13px;color:var(--warm);letter-spacing:.08em;padding:10px 4px}
+  .back[hidden]{visibility:hidden;display:block}
+  .nav.hide{display:none}
+
+  /* end */
+  .end{text-align:center;padding-top:16vh}
+  .end .diamond{width:12px;height:12px;border:1.5px solid var(--gold);transform:rotate(45deg);margin:0 auto 28px}
+  .end p.quote{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:20px;line-height:1.5;color:var(--terracotta);max-width:460px;margin:22px auto}
+  .sig{font-family:'Playfair Display',Georgia,serif;font-size:18px;margin-top:30px}
+  .err{color:var(--terracotta);font-size:13px;margin-top:14px;display:none}
+
+  @media (max-width:380px){ .scale{gap:3px} .scale button{font-size:13px} .brand{display:none} }
+</style>
+</head>
+<body>
+
+<div class="top hide" id="top"><div class="top-in">
+  <span class="brand">YPO Forum · Marrakech</span>
+  <div class="bar"><i id="barfill"></i></div>
+  <span class="count" id="count"></span>
+</div></div>
+
+<form id="f" onsubmit="return false">
+
+<!-- 0 · WELCOME -->
+<section class="hero on" data-s="0">
+  <img src="img/r72_courtyard_palms.jpg" alt="">
+  <div class="veil"></div>
+  <div class="in">
+    <div class="label">YPO Forum Retreat · Dare to Be Human</div>
+    <div class="rule"></div>
+    <h1>Before the days<br>fill up again</h1>
+    <div class="dates">October 2–5, 2026<span>◆</span>Marrakech</div>
+    <p class="body">A few minutes to look back on these days together. Your words help me understand what they held for you, and shape what comes next. There are no right answers.</p>
+    <p class="body" style="font-size:13.5px;color:#D9CBB8;margin-top:6px">About 5 minutes · Your answers come only to me.</p>
+    <button type="button" class="btn light" style="margin-top:22px" onclick="go(1)">Begin</button>
+  </div>
+</section>
+
+<!-- 1 -->
+<section class="screen" data-s="1"><div class="wrap">
+  <div class="label">01 · Arriving home</div><div class="rule"></div>
+  <h2>In a word or a sentence: how are you leaving Morocco?</h2>
+  <p class="hint">Whatever comes first.</p>
+  <input type="text" name="leaving" data-req placeholder="I am leaving…" autocomplete="off">
+  <div class="need">A word is enough.</div>
+</div></section>
+
+<!-- 2 -->
+<section class="screen" data-s="2"><div class="wrap">
+  <div class="label">02 · Your Forum</div><div class="rule"></div>
+  <h2>How much closer does your Forum feel after these days?</h2>
+  <p class="hint">0 means no different. 10 means much closer.</p>
+  <div class="scale" data-name="forum_closer" data-req></div>
+  <div class="ends"><span>No different</span><span>Much closer</span></div>
+  <div class="need">Please choose a number to continue.</div>
+</div></section>
+
+<!-- 3 -->
+<section class="screen" data-s="3"><div class="wrap">
+  <div class="label">03 · The experiences</div><div class="rule"></div>
+  <h2>Which experiences stay with you most?</h2>
+  <p class="hint">Choose up to three.</p>
+  <div class="choices" data-name="top_experiences" data-max="3" data-min="1" data-req>
+    <button type="button" class="choice" data-v="The Medina"><span class="dot"></span><span class="t">The old town, the Medina<small>Friday, with Younes</small></span></button>
+    <button type="button" class="choice" data-v="Forum day"><span class="dot"></span><span class="t">The Forum day at the riad<small>Saturday: movement, breathwork and sound, then Forum</small></span></button>
+    <button type="button" class="choice" data-v="Agafay desert"><span class="dot"></span><span class="t">The Agafay desert<small>Saturday</small></span></button>
+    <button type="button" class="choice" data-v="The hammam"><span class="dot"></span><span class="t">The Moroccan hammam<small>Sunday, at Riad 72</small></span></button>
+    <button type="button" class="choice" data-v="High Atlas"><span class="dot"></span><span class="t">The High Atlas and the Amazigh family<small>Sunday, with Youssef</small></span></button>
+  </div>
+  <div class="pickcount" data-for="top_experiences"></div>
+  <div class="opt">Why these? (optional)</div>
+  <textarea name="top_experiences_why" placeholder="What made them stay with you…"></textarea>
+  <div class="need">Please choose at least one to continue.</div>
+</div></section>
+
+<!-- 4 -->
+<section class="screen" data-s="4"><div class="wrap">
+  <div class="label">04 · Around the table</div><div class="rule"></div>
+  <h2>Three evenings, three very different tables. How was each one?</h2>
+  <p class="hint">0 to 10 for each.</p>
+  <div class="row"><div class="name">Kabana</div><div class="role">The festive rooftop · Friday</div>
+    <div class="scale sm" data-name="d_kabana" data-req data-why="What was it about it that you did not particularly appreciate?"></div></div>
+  <div class="row"><div class="name">The Agafay desert</div><div class="role">Dinner under the sky, with live music · Saturday</div>
+    <div class="scale sm" data-name="d_agafay" data-req data-why="What was it about it that you did not particularly appreciate?"></div></div>
+  <div class="row"><div class="name">The Royal Mansour</div><div class="role">The palace evening · Sunday</div>
+    <div class="scale sm" data-name="d_royalmansour" data-req data-why="What was it about it that you did not particularly appreciate?"></div></div>
+  <div class="need">Please rate each evening to continue.</div>
+  <div class="photo"><img src="img/r72_koutoubia_sunset.jpg" alt="Sunset over Marrakech and the Koutoubia"></div>
+</div></section>
+
+<!-- 5 -->
+<section class="screen" data-s="5"><div class="wrap">
+  <div class="label">05 · The rhythm of the days</div><div class="rule"></div>
+  <h2>Did the days hold a good mix of intensity, variety and time to recover?</h2>
+  <p class="hint">0 means the balance was off. 10 means it was just right.</p>
+  <div class="scale" data-name="rhythm" data-req data-why="What would have made the balance better?"></div>
+  <div class="ends"><span>The balance was off</span><span>Just right</span></div>
+  <div class="need">Please choose a number to continue.</div>
+</div></section>
+
+<!-- 6 -->
+<section class="screen" data-s="6"><div class="wrap">
+  <div class="label">06 · The handbook</div><div class="rule"></div>
+  <h2>This retreat had no facilitator in the room. The handbook was there to guide you.</h2>
+  <p class="hint">How well did it guide you through the sessions?</p>
+  <div class="scale" data-name="handbook" data-req></div>
+  <div class="ends"><span>Not at all</span><span>Completely</span></div>
+  <div class="opt">Anything you would like to add? (optional)</div>
+  <textarea name="handbook_note" placeholder=""></textarea>
+  <div class="need">Please choose a number to continue.</div>
+</div></section>
+
+<!-- 7 -->
+<section class="screen" data-s="7"><div class="wrap">
+  <div class="label">07 · Your home for three nights</div><div class="rule"></div>
+  <h2>How was your stay at Riad 72?</h2>
+  <p class="hint">Your room, the riad, the team.</p>
+  <div class="scale" data-name="riad" data-req data-why="What would have made it better?"></div>
+  <div class="ends"><span>Disappointing</span><span>Exceptional</span></div>
+  <div class="need">Please choose a number to continue.</div>
+  <div class="photo"><img src="img/r72_courtyard_lounge.jpg" alt="Riad 72 courtyard"></div>
+</div></section>
+
+<!-- 8 -->
+<section class="screen" data-s="8"><div class="wrap">
+  <div class="label">08 · The people who looked after you</div><div class="rule"></div>
+  <h2>How would you rate each of them?</h2>
+  <div class="private"><span>◆</span><span>Only I see these answers. They are never shared with the people named.</span></div>
+  <div class="row"><div class="name">The drivers</div><div class="role">Every transfer, from arrival to departure</div>
+    <div class="scale sm" data-name="p_drivers" data-req data-why="What happened?"></div></div>
+  <div class="row"><div class="name">Younes</div><div class="role">Your guide in the Medina · Friday</div>
+    <div class="scale sm" data-name="p_younes" data-req data-why="What happened?"></div><button type="button" class="na" data-for="p_younes">I did not attend</button></div>
+  <div class="row"><div class="name">Stefani</div><div class="role">Yoga, breathwork and sound · opening the Forum day</div>
+    <div class="scale sm" data-name="p_stefani" data-req data-why="What happened?"></div><button type="button" class="na" data-for="p_stefani">I did not attend</button></div>
+  <div class="row"><div class="name">The hammam at Riad 72</div><div class="role">Sunday</div>
+    <div class="scale sm" data-name="p_hammam" data-req data-why="What happened?"></div><button type="button" class="na" data-for="p_hammam">I did not attend</button></div>
+  <div class="row"><div class="name">Youssef</div><div class="role">Your guide in the High Atlas · Sunday</div>
+    <div class="scale sm" data-name="p_youssef" data-req data-why="What happened?"></div><button type="button" class="na" data-for="p_youssef">I did not attend</button></div>
+  <div class="need">Please rate each one, or mark that you did not attend.</div>
+</div></section>
+
+<!-- 9 -->
+<section class="screen" data-s="9"><div class="wrap">
+  <div class="label">09 · Shaping what comes next</div><div class="rule"></div>
+  <h2>How could we make this Forum experience even better, for you in the future or for other Forums?</h2>
+  <p class="hint">Optional, and the most useful thing you can tell me.</p>
+  <textarea name="better" placeholder=""></textarea>
+</div></section>
+
+<!-- 10 -->
+<section class="screen" data-s="10"><div class="wrap">
+  <div class="label">10 · What remains</div><div class="rule"></div>
+  <h2>Is there one thing in particular that stayed with you?</h2>
+  <p class="hint">A moment, a word, a conversation, a silence.</p>
+  <textarea name="stayed" placeholder=""></textarea>
+  <div class="photo"><img src="img/agafay_sunset.jpg" alt="Sunset over the Agafay desert"></div>
+</div></section>
+
+<!-- 11 -->
+<section class="screen" data-s="11"><div class="wrap">
+  <div class="label">11 · Another Forum</div><div class="rule"></div>
+  <h2>How likely are you to recommend this retreat to another Forum?</h2>
+  <div class="scale" data-name="recommend" data-req></div>
+  <div class="ends"><span>Not likely</span><span>Without hesitation</span></div>
+  <div class="opt" style="margin-top:28px;font-size:14px;color:var(--deep)">If you did, what would you tell them about your experience? (optional)</div>
+  <textarea name="recommend_words" placeholder="I would tell them…"></textarea>
+  <div class="need">Please choose a number to continue.</div>
+</div></section>
+
+<!-- 12 -->
+<section class="screen" data-s="12"><div class="wrap">
+  <div class="label">12 · Your words</div><div class="rule"></div>
+  <h2>May I share your words when I speak about this retreat?</h2>
+  <p class="hint">Only what you have written here, and only in the way you choose.</p>
+  <div class="choices" data-name="consent" data-max="1" data-req>
+    <button type="button" class="choice" data-v="Yes, with my first name"><span class="dot"></span><span class="t">Yes, with my first name</span></button>
+    <button type="button" class="choice" data-v="Yes, anonymously"><span class="dot"></span><span class="t">Yes, anonymously</span></button>
+    <button type="button" class="choice" data-v="No"><span class="dot"></span><span class="t">I would rather you did not</span></button>
+  </div>
+  <div class="need">Please choose one to continue.</div>
+  <div class="opt" style="margin-top:30px">Your name, if you wish (optional)</div>
+  <input type="text" name="name" placeholder="Your name" autocomplete="name">
+  <div class="err" id="err">Something interrupted the sending. Please try again in a moment.</div>
+</div></section>
+
+<!-- 13 · THANK YOU -->
+<section class="screen end" data-s="13"><div class="wrap">
+  <div class="diamond"></div>
+  <div class="label">Shukran</div>
+  <h1>Thank you</h1>
+  <p class="quote">Moments like these do not end at the airport. They travel home with you.</p>
+  <p class="body" style="color:var(--warm)">Your words have reached me, and I will read every one of them.</p>
+  <div class="sig">Zineb</div>
+  <div class="label" style="margin-top:6px;color:var(--warm);font-size:9.5px">Dare to Be Human · YPO Forum · Marrakech, October 2–5</div>
+</div></section>
+
+</form>
+
+<div class="nav hide" id="nav"><div class="nav-in">
+  <button type="button" class="back" id="back" onclick="go(cur-1)">← Back</button>
+  <button type="button" class="btn" id="next" onclick="next()">Continue</button>
+</div></div>
+
+<script>
+/* Where answers go. Filled in when the response sheet is connected.
+   Empty = preview mode: nothing leaves the page. */
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbx37e7m2NwH2-OBdh_L_ZAB3OQPnM3Ocmjr63E9r0wS-7A5StdGxz7GwDHZgvcvCSNW/exec";
+const LAST_Q = 12, END = 13;
+const LOW = 6;            /* a score below this opens "why", and the why is required */
+let cur = 0;
+const data = {};
+
+/* 0-10 scales */
+document.querySelectorAll('.scale').forEach(sc => {
+  for (let i = 0; i <= 10; i++) {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = i;
+    b.onclick = () => {
+      sc.querySelectorAll('button').forEach(x => x.classList.remove('sel')); b.classList.add('sel');
+      data[sc.dataset.name] = i;
+      const na = document.querySelector(`.na[data-for="${sc.dataset.name}"]`); if (na) na.classList.remove('sel');
+      if (sc.dataset.why) toggleWhy(sc, i < LOW);
+      clearNeed();
+    };
+    sc.appendChild(b);
+  }
+  if (sc.dataset.why) {
+    const w = document.createElement('div'); w.className = 'why'; w.dataset.for = sc.dataset.name;
+    w.innerHTML = `<div class="opt">${sc.dataset.why}</div><textarea name="${sc.dataset.name}_why" placeholder=""></textarea>`;
+    const need = [...sc.parentNode.children].find(c => c.classList.contains('need'));
+    need ? sc.parentNode.insertBefore(w, need) : sc.parentNode.appendChild(w);
+  }
+});
+function whyOf(name){ return document.querySelector(`.why[data-for="${name}"]`); }
+function toggleWhy(sc, show){ const w = whyOf(sc.dataset.name); if (w) w.classList.toggle('show', show); }
+
+/* "did not attend" */
+document.querySelectorAll('.na').forEach(n => n.onclick = () => {
+  const on = !n.classList.contains('sel'); n.classList.toggle('sel', on);
+  const sc = document.querySelector(`.scale[data-name="${n.dataset.for}"]`);
+  sc.querySelectorAll('button').forEach(x => x.classList.remove('sel'));
+  if (on) data[n.dataset.for] = 'Did not attend'; else delete data[n.dataset.for];
+  toggleWhy(sc, false); clearNeed();
+});
+
+/* choice lists */
+document.querySelectorAll('.choices').forEach(ch => {
+  const max = +ch.dataset.max, name = ch.dataset.name;
+  const btns = [...ch.querySelectorAll('.choice')];
+  const sync = () => {
+    const picked = btns.filter(b => b.classList.contains('sel'));
+    if (max === 1) { if (picked[0]) data[name] = picked[0].dataset.v; else delete data[name]; }
+    else data[name] = picked.map(b => b.dataset.v);
+    if (max > 1) {
+      btns.forEach(b => b.classList.toggle('dim', picked.length >= max && !b.classList.contains('sel')));
+      const pc = document.querySelector(`.pickcount[data-for="${name}"]`);
+      if (pc) pc.textContent = picked.length ? `${picked.length} of ${max} chosen` : '';
+    }
+    clearNeed();
+  };
+  btns.forEach(b => b.onclick = () => {
+    if (max === 1) { btns.forEach(x => x.classList.remove('sel')); b.classList.add('sel'); }
+    else if (b.classList.contains('sel')) b.classList.remove('sel');
+    else if (btns.filter(x => x.classList.contains('sel')).length < max) b.classList.add('sel');
+    sync();
+  });
+});
+document.addEventListener('input', clearNeed);
+
+/* required answers: checked before leaving a screen */
+function missingOn(n){
+  const s = document.querySelector(`[data-s="${n}"]`); const miss = [];
+  s.querySelectorAll('[data-req]').forEach(el => {
+    if (el.classList.contains('scale')) {
+      const v = data[el.dataset.name];
+      if (v === undefined) miss.push(el.closest('.row') || el);
+      else if (typeof v === 'number' && v < LOW && el.dataset.why) {
+        const t = whyOf(el.dataset.name).querySelector('textarea');
+        if (!t.value.trim()) miss.push(t);
+      }
+    } else if (el.classList.contains('choices')) {
+      const v = data[el.dataset.name], max = +el.dataset.max;
+      const min = +(el.dataset.min || max);
+      const ok = max === 1 ? !!v : (Array.isArray(v) && v.length >= min && v.length <= max);
+      if (!ok) miss.push(el);
+    } else if (!el.value.trim()) miss.push(el);
+  });
+  return miss;
+}
+function clearNeed(){
+  document.querySelectorAll('.need.show').forEach(x => x.classList.remove('show'));
+  document.querySelectorAll('.missing').forEach(x => x.classList.remove('missing'));
+}
+function showNeed(n, miss){
+  const s = document.querySelector(`[data-s="${n}"]`);
+  miss.forEach(m => m.classList.add('missing'));
+  const need = s.querySelector('.need');
+  const lowWhy = miss.find(m => m.tagName === 'TEXTAREA');
+  if (need) { need.textContent = lowWhy ? 'Please share a few words on what happened, so I can understand.' : need.dataset.msg || need.textContent; need.classList.add('show'); }
+  miss[0].scrollIntoView({behavior:'smooth', block:'center'});
+}
+document.querySelectorAll('.need').forEach(x => x.dataset.msg = x.textContent);
+
+function go(n){
+  if (n < 0 || n > END) return;
+  clearNeed();
+  document.querySelectorAll('[data-s]').forEach(s => s.classList.remove('on'));
+  document.querySelector(`[data-s="${n}"]`).classList.add('on');
+  cur = n;
+  const inQ = n >= 1 && n <= LAST_Q;
+  document.getElementById('top').classList.toggle('hide', !inQ);
+  document.getElementById('nav').classList.toggle('hide', !inQ);
+  document.getElementById('back').hidden = n <= 1;
+  document.getElementById('next').textContent = n === LAST_Q ? 'Send' : 'Continue';
+  document.getElementById('barfill').style.width = (n / LAST_Q * 100) + '%';
+  document.getElementById('count').textContent = inQ ? `${n} / ${LAST_Q}` : '';
+  window.scrollTo(0, 0);
+  const t = document.querySelector(`[data-s="${n}"] input[type=text]`); if (t && window.innerWidth > 700) t.focus();
+}
+function next(){
+  const miss = missingOn(cur);
+  if (miss.length) { showNeed(cur, miss); return; }
+  cur === LAST_Q ? send() : go(cur + 1);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.tagName === 'INPUT' && cur >= 1 && cur <= LAST_Q) { e.preventDefault(); next(); }
+});
+
+/* preview helper: index.html#7 opens screen 7 */
+if (/^#\d+$/.test(location.hash)) go(+location.hash.slice(1));
+
+async function send(){
+  document.querySelectorAll('textarea,input[type=text]').forEach(el => { if (el.value.trim()) data[el.name] = el.value.trim(); });
+  const payload = { submitted: new Date().toISOString(), ...data };
+  const btn = document.getElementById('next'); btn.textContent = 'Sending…'; btn.disabled = true;
+  try {
+    if (ENDPOINT) {
+      await fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
+    } else {
+      console.log('Preview mode, not sent:', payload);
+    }
+    go(END);
+  } catch (e) {
+    document.getElementById('err').style.display = 'block';
+    btn.textContent = 'Send'; btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
